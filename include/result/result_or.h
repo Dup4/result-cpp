@@ -8,11 +8,10 @@
 
 namespace result {
 
-template <typename ErrorCode, std::map<ErrorCode, std::string> ErrorCodeToStr, typename T>
-class ResultOr : public Result<ErrorCode, ErrorCodeToStr> {
-    using Result = Result<ErrorCode, ErrorCodeToStr>;
+template <typename Result, typename T>
+class ResultOr : public Result {
     template <typename F>
-    using ROr = ResultOr<ErrorCode, ErrorCodeToStr, F>;
+    using ROr = ResultOr<Result, F>;
 
 public:
     ResultOr() = default;
