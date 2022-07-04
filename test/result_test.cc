@@ -47,3 +47,40 @@ TEST_F(ResultTest, result_test) {
         EXPECT_EQ("OtherError", CustomResult::ErrorCodeToStr(CustomResult::ErrorCode::OtherError));
     }
 }
+
+TEST_F(ResultTest, result_or_test) {
+    {
+        auto res = CustomResultOr<int>::Builder(CustomResult::ErrorCode::OK).Build();
+        auto error_message = res.Message();
+        EXPECT_TRUE(res.IsOK());
+        EXPECT_EQ(error_message, std::string("OK"));
+    }
+
+    {
+        auto res = CustomResultOr<int>::Builder(CustomResult::ErrorCode::OtherError).Build();
+        auto error_message = res.Message();
+        EXPECT_TRUE(res.Is(CustomResult::ErrorCode::OtherError));
+        EXPECT_FALSE(res.IsOK());
+        EXPECT_EQ(error_message, std::string("OtherError"));
+    }
+
+    {
+        auto res = CustomResultOr<int>::Builder(CustomResult::ErrorCode::OtherError).WithErrorMessage("ddd").Build();
+        auto error_message = res.Message();
+        EXPECT_TRUE(res.Is(CustomResult::ErrorCode::OtherError));
+        EXPECT_FALSE(res.IsOK());
+        EXPECT_EQ(error_message, std::string("ddd"));
+    }
+
+    {
+        CustomResultOr<int> a = 2;
+        EXPECT_EQ(2, a.Value());
+        EXPECT_EQ(2, a.ValueOr(3));
+    }
+
+    {
+        CustomResultOr<std::string> a = std::string("2");
+        EXPECT_EQ("2", a.Value());
+        EXPECT_EQ("2", a.ValueOr("3"));
+    }
+}
