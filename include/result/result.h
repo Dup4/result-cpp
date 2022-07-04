@@ -7,6 +7,7 @@
 #include <string_view>
 #include <type_traits>
 
+#include "./internal/visit_external_error_code_to_str.h"
 #include "./types_check/has_error_code_to_str.h"
 
 namespace result {
@@ -16,10 +17,16 @@ class Result {
     using R = Result<ErrorCodeType>;
 
     static_assert(std::is_enum_v<ErrorCodeType>, "ErrorCode Must be a Enum");
+    static_assert(internal::has_error_code_to_str_v<ErrorCodeType>, "ErrorCode Must have a ErrorCodeToStr");
 
 public:
     using ErrorCode = ErrorCodeType;
 
+    static std::string ErrorCodeToStr(ErrorCode error_code) {
+        return internal::VisitExternalErrorCodeToStr(error_code);
+    }
+
+public:
     struct Options {
         std::optional<std::string> error_message{std::nullopt};
     };
@@ -36,13 +43,7 @@ public:
         }
 
         R Build() {
-            if (!options_.error_message.has_value()) {
-                if constexpr (internal::has_error_code_to_str_v<ErrorCode>) {
-                    options_.error_message = ErrorCodeToStr(error_code_);
-                }
-            }
-
-            return R(error_code_, options_.error_message.value_or(""));
+            return R(error_code_, options_.error_message.value_or(ErrorCodeToStr(error_code_)));
         }
 
     private:
@@ -69,16 +70,16 @@ public:
     }
 
     bool Is(ErrorCode error_code) const {
-        return Code() == error_code;
+        return error_code_ == error_code;
     }
 
     bool IsOK() const {
-        return error_code_ == ErrorCode::kOK;
+        return Is(ErrorCode::OK);
     }
 
 private:
-    ErrorCode error_code_{ErrorCode::kOK};
-    std::string error_message_{"OK"};
+    ErrorCode error_code_{ErrorCode::OK};
+    std::string error_message_{ErrorCodeToStr(ErrorCode::OK)};
 };
 
 }  // namespace result

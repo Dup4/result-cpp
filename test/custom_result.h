@@ -9,8 +9,8 @@
 namespace custom_result {
 
 enum class ErrorCode {
-    kOK = 0,
-    kOtherError,
+    OK = 0,
+    OtherError,
 };
 
 using CustomResult = result::Result<ErrorCode>;
@@ -21,8 +21,8 @@ using CustomResultOr = result::ResultOr<CustomResult, T>;
 template <typename T, std::enable_if_t<std::is_same_v<custom_result::ErrorCode, T>, bool> = true>
 inline auto ErrorCodeToStr(T error_code) {
     static const std::map<custom_result::ErrorCode, std::string> ErrorCodeToStrMap = {
-            {custom_result::ErrorCode::kOK, "OK"},
-            {custom_result::ErrorCode::kOtherError, "OtherError"},
+            {custom_result::ErrorCode::OK, "OK"},
+            {custom_result::ErrorCode::OtherError, "OtherError"},
     };
 
     if (ErrorCodeToStrMap.count(error_code) == 0) {
