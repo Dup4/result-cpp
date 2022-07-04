@@ -13,13 +13,7 @@ enum class ErrorCode {
     OtherError,
 };
 
-using CustomResult = result::Result<ErrorCode>;
-
-template <typename T>
-using CustomResultOr = result::ResultOr<CustomResult, T>;
-
-template <typename T, std::enable_if_t<std::is_same_v<custom_result::ErrorCode, T>, bool> = true>
-inline auto ErrorCodeToStr(T error_code) {
+inline auto ErrorCodeToStr(ErrorCode error_code) {
     static const std::map<custom_result::ErrorCode, std::string> ErrorCodeToStrMap = {
             {custom_result::ErrorCode::OK, "OK"},
             {custom_result::ErrorCode::OtherError, "OtherError"},
@@ -31,5 +25,10 @@ inline auto ErrorCodeToStr(T error_code) {
 
     return ErrorCodeToStrMap.at(error_code);
 }
+
+using CustomResult = result::Result<ErrorCode>;
+
+template <typename T>
+using CustomResultOr = result::ResultOr<CustomResult, T>;
 
 }  // namespace custom_result
