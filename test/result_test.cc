@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "result/macros.h"
 #include "snapshot/snapshot.h"
 
 #include "./custom_result.h"
@@ -82,6 +83,32 @@ TEST_F(ResultTest, result_or_test) {
         CustomResultOr<std::string> a = std::string("2");
         EXPECT_EQ("2", a.Value());
         EXPECT_EQ("2", a.ValueOr("3"));
+    }
+}
+
+TEST_F(ResultTest, macros_RESULT_OR_RETURN) {
+    auto gen_err = [](int x) -> CustomResult {
+        if (x == 0) {
+            return CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
+        }
+
+        return CustomResult::Builder(CustomResult::ErrorCode::OK).Build();
+    };
+
+    auto f = [&gen_err](int x) -> CustomResult {
+        RESULT_OR_RETURN(gen_err(x));
+
+        return CustomResult::Builder(CustomResult::ErrorCode::OK).Build();
+    };
+
+    {
+        auto res = f(0);
+        EXPECT_FALSE(res.IsOK());
+    }
+
+    {
+        auto res = f(1);
+        EXPECT_TRUE(res.IsOK());
     }
 }
 
