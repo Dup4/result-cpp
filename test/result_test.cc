@@ -84,3 +84,31 @@ TEST_F(ResultTest, result_or_test) {
         EXPECT_EQ("2", a.ValueOr("3"));
     }
 }
+
+TEST_F(ResultTest, macros_RESULT_MUST) {
+    auto gen_err = [](int x) -> CustomResultOr<int> {
+        if (x == 0) {
+            return CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
+        }
+
+        return x;
+    };
+
+    auto f = [&gen_err](int x) -> CustomResultOr<int> {
+        RESULT_MUST(a, gen_err(x));
+
+        EXPECT_EQ(a, x);
+
+        return a;
+    };
+
+    {
+        auto res = f(0);
+        EXPECT_FALSE(res.IsOK());
+    }
+
+    f(1);
+    f(2);
+    f(3);
+    f(4);
+}
