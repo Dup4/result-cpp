@@ -95,10 +95,8 @@ TEST_F(ResultTest, macros_RESULT_MUST) {
     };
 
     auto f = [&gen_err](int x) -> CustomResultOr<int> {
-        RESULT_MUST(a, gen_err(x));
-
+        RESULT_VALUE_OR_RETURN(a, gen_err(x));
         EXPECT_EQ(a, x);
-
         return a;
     };
 
@@ -107,8 +105,11 @@ TEST_F(ResultTest, macros_RESULT_MUST) {
         EXPECT_FALSE(res.IsOK());
     }
 
-    f(1);
-    f(2);
-    f(3);
-    f(4);
+    {
+        for (int i = 1; i <= 100; i++) {
+            auto res = f(i);
+            EXPECT_TRUE(res.IsOK());
+            EXPECT_EQ(res.Value(), i);
+        }
+    }
 }
