@@ -96,7 +96,7 @@ TEST_F(ResultTest, macros_RESULT_OR_RETURN) {
     };
 
     auto f = [&gen_err](int x) -> CustomResult {
-        RESULT_OR_RETURN(gen_err(x));
+        RESULT_OK_OR_RETURN(gen_err(x));
 
         return CustomResult::Builder(CustomResult::ErrorCode::OK).Build();
     };
