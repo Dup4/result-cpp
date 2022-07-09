@@ -85,7 +85,7 @@ TEST_F(ResultTest, result_or_test) {
     }
 }
 
-TEST_F(ResultTest, macros_RESULT_MUST) {
+TEST_F(ResultTest, macros_RESULT_OR_VALUE_RETURN) {
     auto gen_err = [](int x) -> CustomResultOr<int> {
         if (x == 0) {
             return CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
