@@ -13,7 +13,7 @@
         return res_name;                                        \
     }                                                           \
                                                                 \
-    auto var_name = std::move(res_name.Value());
+    var_name = std::move(res_name.Value());
 
 #define __RESULT_GENERATE_RES_NAME(line, counter) __RESULT_GENERATE_RES_NAME_(line, counter)
 #define __RESULT_GENERATE_RES_NAME_(line, counter) __res_##line##_##counter##_

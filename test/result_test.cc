@@ -122,8 +122,8 @@ TEST_F(ResultTest, macros_RESULT_OR_VALUE_RETURN) {
     };
 
     auto f = [&gen_err](int x) -> CustomResultOr<int> {
-        RESULT_VALUE_OR_RETURN(a, gen_err(x));
-        RESULT_VALUE_OR_RETURN(b, gen_err(x));
+        RESULT_VALUE_OR_RETURN(auto a, gen_err(x));
+        RESULT_VALUE_OR_RETURN(auto b, gen_err(x));
 
         EXPECT_EQ(a, x);
         EXPECT_EQ(b, x);
