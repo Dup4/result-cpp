@@ -52,6 +52,10 @@ public:
         ErrorCodeType error_code_;
     };
 
+    static R OK() {
+        return R(ErrorCode::OK, ErrorCodeToStr(ErrorCode::OK));
+    }
+
 public:
     Result() = default;
     Result(ErrorCode error_code, std::string_view error_message = "")

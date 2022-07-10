@@ -28,6 +28,13 @@ TEST_F(ResultTest, result_test) {
     }
 
     {
+        auto res = CustomResult::OK();
+        auto error_message = res.Message();
+        EXPECT_TRUE(res.IsOK());
+        EXPECT_EQ(error_message, std::string("OK"));
+    }
+
+    {
         auto res = CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
         auto error_message = res.Message();
         EXPECT_TRUE(res.Is(CustomResult::ErrorCode::OtherError));
