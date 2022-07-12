@@ -54,6 +54,8 @@ public:
         return *this;
     }
 
+    virtual ~ResultOr() override = default;
+
     const T& Value() const& {
         return *value_;
     }

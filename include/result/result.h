@@ -62,38 +62,12 @@ public:
     Result(ErrorCode error_code, std::string_view error_message = "")
             : error_code_(error_code), error_message_(error_message) {}
 
-    virtual ~Result() {}
+    virtual ~Result() = default;
 
     Result(const Result&) = default;
     Result& operator=(const Result&) = default;
     Result(Result&&) = default;
     Result& operator=(Result&&) = default;
-
-    template <typename T>
-    Result(const T& t) {
-        error_code_ = t.Code();
-        error_message_ = t.Message();
-    }
-
-    template <typename T>
-    Result& operator=(const T& t) {
-        error_code_ = t.Code();
-        error_message_ = t.Message();
-        return *this;
-    }
-
-    template <typename T>
-    Result(T&& t) {
-        error_code_ = std::move(t.MoveCode());
-        error_message_ = std::move(t.MoveMessage());
-    }
-
-    template <typename T>
-    Result& operator=(T&& t) {
-        error_code_ = std::move(t.MoveCode());
-        error_message_ = std::move(t.MoveMessage());
-        return *this;
-    }
 
     ErrorCode Code() const {
         return error_code_;
