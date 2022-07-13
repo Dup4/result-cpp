@@ -9,8 +9,9 @@
 #include "iostream"
 
 #include "./internal/visit_external_error_code_to_str.h"
-#include "./macros.h"  // IWYU pragma: export
 #include "./types_check/has_error_code_to_str.h"
+
+#include "./macros.h"  // IWYU pragma: export
 
 namespace result {
 
