@@ -18,7 +18,7 @@ public:
 
     ResultOr(T&& value) : value_(std::move(value)) {}
 
-    ResultOr(Result&& result) : Result(result) {}
+    ResultOr(Result&& result) : Result(std::move(result)) {}
 
     ResultOr(const ROr<T>& other) : Result(other), value_(other.value_) {}
 
