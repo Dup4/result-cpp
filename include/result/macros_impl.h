@@ -1,15 +1,28 @@
 #ifndef RESULT_MACROS_IMPL_H
 #define RESULT_MACROS_IMPL_H
 
-#define __RESULT_OK_OR_RETURN_IMPL(func, res_name) \
-    auto res_name = func;                          \
-    if (!res_name.IsOK()) {                        \
-        return res_name;                           \
+#define __RESULT_DIRECT_RETURN_IMPL(func, res_name)         \
+    auto res_name = func;                                   \
+                                                            \
+    if (!res_name.IsOK()) {                                 \
+        res_name.PushHistory(__FILE__, __func__, __LINE__); \
+    }                                                       \
+                                                            \
+    return res_name;
+
+#define __RESULT_OK_OR_RETURN_IMPL(func, res_name)          \
+    auto res_name = func;                                   \
+                                                            \
+    if (!res_name.IsOK()) {                                 \
+        res_name.PushHistory(__FILE__, __func__, __LINE__); \
+        return res_name;                                    \
     }
 
 #define __RESULT_VALUE_OR_RETURN_IMPL(var_name, func, res_name) \
     auto res_name = func;                                       \
+                                                                \
     if (!res_name.IsOK()) {                                     \
+        res_name.PushHistory(__FILE__, __func__, __LINE__);     \
         return res_name;                                        \
     }                                                           \
                                                                 \

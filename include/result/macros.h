@@ -3,7 +3,7 @@
 
 #include "./macros_impl.h"
 
-#define RESULT_DIRECT_RETURN(func) return func;
+#define RESULT_DIRECT_RETURN(func) __RESULT_DIRECT_RETURN_IMPL(func, __RESULT_GENERATE_RES_NAME(__LINE__, __COUNTER__))
 
 #define RESULT_OK_OR_RETURN(func) __RESULT_OK_OR_RETURN_IMPL(func, __RESULT_GENERATE_RES_NAME(__LINE__, __COUNTER__))
 

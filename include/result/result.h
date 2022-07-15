@@ -1,11 +1,13 @@
 #ifndef RESULT_RESULT_H
 #define RESULT_RESULT_H
 
+#include <cstddef>
 #include <map>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 #include "./internal/visit_external_error_code_to_str.h"
 #include "./types_check/has_error_code_to_str.h"
@@ -53,6 +55,12 @@ public:
         ErrorCodeType error_code_;
     };
 
+    struct HistoryInfoNode {
+        std::string file_name;
+        std::string func_name;
+        int32_t line;
+    };
+
     static R OK() {
         return R(ErrorCode::OK, ErrorCodeToStr(ErrorCode::OK));
     }
@@ -93,9 +101,48 @@ public:
         return Is(ErrorCode::OK);
     }
 
+    void PushHistory(const std::string& file_name, const std::string& func_name, int32_t line) {
+        if (IsOK()) {
+            return;
+        }
+
+        history_info_list_.emplace_back(HistoryInfoNode{
+                .file_name = file_name,
+                .func_name = func_name,
+                .line = line,
+        });
+
+        return;
+    }
+
+    std::string GetPrettyHistoryInfo() {
+        std::string res = "";
+
+        int ix = 0;
+
+        for (int i = history_info_list_.size() - 1; i >= 0; i--) {
+            const auto& info = history_info_list_[i];
+
+            if (ix) {
+                res += " -> ";
+            }
+
+            ix++;
+
+            res += info.file_name;
+            res += ":";
+            res += std::to_string(info.line);
+        }
+
+        return res;
+    }
+
 private:
     ErrorCode error_code_{ErrorCode::OK};
     std::string error_message_{ErrorCodeToStr(ErrorCode::OK)};
+
+private:
+    std::vector<HistoryInfoNode> history_info_list_;
 };
 
 }  // namespace result

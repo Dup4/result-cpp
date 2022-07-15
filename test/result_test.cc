@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
-#include "result/macros.h"
 #include "snapshot/snapshot.h"
 
 #include "./custom_result.h"
 
+#include "result/macros.h"
 #include "result/result.h"
 #include "result/result_or.h"
 #include "result/types_check/has_error_code_to_str.h"
@@ -159,4 +159,24 @@ TEST_F(ResultTest, macros_RESULT_OR_VALUE_RETURN) {
             EXPECT_EQ(res.Value(), i);
         }
     }
+}
+
+TEST_F(ResultTest, history_info_test) {
+    auto a = []() {
+        RESULT_DIRECT_RETURN(CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build());
+    };
+
+    auto b = [&a]() {
+        RESULT_DIRECT_RETURN(a());
+    };
+
+    auto c = [&b]() {
+        RESULT_DIRECT_RETURN(b());
+    };
+
+    auto err = c();
+
+    auto history_info = err.GetPrettyHistoryInfo();
+
+    EXPECT_EQ(history_info, std::string("/Users/dup4/Documents/repo/Dup4/result-cpp/test/result_test.cc:174 -> /Users/dup4/Documents/repo/Dup4/result-cpp/test/result_test.cc:170 -> /Users/dup4/Documents/repo/Dup4/result-cpp/test/result_test.cc:166"));
 }
