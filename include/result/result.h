@@ -85,6 +85,14 @@ public:
         return error_message_;
     }
 
+    int32_t GetErrorCodeInteger() const {
+        return static_cast<int32_t>(error_code_);
+    }
+
+    std::string GetErrorCodeStr() const {
+        return ErrorCodeToStr(error_code_);
+    }
+
     ErrorCode MoveCode() {
         return std::move(error_code_);
     }
