@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include "./custom_result.h"
+#include "./custom_result/custom_result.h"
 
 using namespace custom_result;
 

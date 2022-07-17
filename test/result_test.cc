@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "snapshot/snapshot.h"
 
-#include "./custom_result.h"
+#include "./custom_result/custom_result.h"
 
 #include "result/macros.h"
 #include "result/result.h"
