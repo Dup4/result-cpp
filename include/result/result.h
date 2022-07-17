@@ -17,6 +17,12 @@
 
 namespace result {
 
+struct HistoryInfoNode {
+    std::string file_name;
+    std::string func_name;
+    int32_t line;
+};
+
 template <typename ErrorCodeType>
 class Result {
     using R = Result<ErrorCodeType>;
@@ -56,12 +62,6 @@ public:
         ErrorCodeType error_code_;
     };
 
-    struct HistoryInfoNode {
-        std::string file_name;
-        std::string func_name;
-        int32_t line;
-    };
-
     static R OK() {
         return R(ErrorCode::OK, ErrorCodeToStr(ErrorCode::OK));
     }
@@ -94,6 +94,7 @@ public:
         if (!t.IsOK()) {
             error_code_ = ErrorCode::NestedError;
             error_message_ = t.Message();
+            history_info_list_ = t.HistoryInfoList();
         }
     }
 
@@ -101,16 +102,16 @@ public:
         return error_code_;
     }
 
-    std::string Message() const {
-        return error_message_;
-    }
-
-    int32_t GetErrorCodeInteger() const {
+    int32_t ErrorCodeInteger() const {
         return static_cast<int32_t>(error_code_);
     }
 
-    std::string GetErrorCodeStr() const {
+    std::string ErrorCodeStr() const {
         return ErrorCodeToStr(error_code_);
+    }
+
+    std::string Message() const {
+        return error_message_;
     }
 
     bool Is(ErrorCode error_code) const {
@@ -135,7 +136,7 @@ public:
         return;
     }
 
-    std::string GetPrettyHistoryInfo() {
+    std::string PrettyHistoryInfo() {
         std::string res = "";
 
         int ix = 0;
@@ -157,7 +158,11 @@ public:
         return res;
     }
 
-public:
+    const std::vector<HistoryInfoNode>& HistoryInfoList() const {
+        return history_info_list_;
+    }
+
+private:
     ErrorCode error_code_{ErrorCode::OK};
     std::string error_message_{ErrorCodeToStr(ErrorCode::OK)};
 

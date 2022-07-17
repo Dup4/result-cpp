@@ -177,7 +177,7 @@ TEST_F(ResultTest, history_info_test) {
 
     auto err = c();
 
-    auto history_info = err.GetPrettyHistoryInfo();
+    auto history_info = err.PrettyHistoryInfo();
 
     EXPECT_FALSE(history_info.empty());
 }
