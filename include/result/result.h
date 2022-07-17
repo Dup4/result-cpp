@@ -11,6 +11,7 @@
 
 #include "./internal/visit_external_error_code_to_str.h"
 #include "./types_check/has_error_code_to_str.h"
+#include "./types_check/is_result.h"
 
 #include "./macros.h"  // IWYU pragma: export
 
@@ -77,6 +78,25 @@ public:
     Result(Result&&) = default;
     Result& operator=(Result&&) = default;
 
+    // template <
+    //         typename T,
+    //         std::enable_if_t<internal::is_result_v<T> && std::is_same_v<typename T::ErrorCode, ErrorCode>, bool> =
+    //         true>
+    // Result(T&& t) {
+    //     error_code_ = t.MoveCode();
+    //     error_message_ = t.MoveMessage();
+    // }
+
+    template <typename T,
+              std::enable_if_t<internal::is_result_v<T> && !std::is_same_v<typename T::ErrorCode, ErrorCode>, bool> =
+                      true>
+    Result(T&& t) {
+        if (!t.IsOK()) {
+            error_code_ = ErrorCode::NestedError;
+            error_message_ = t.Message();
+        }
+    }
+
     ErrorCode Code() const {
         return error_code_;
     }
@@ -91,14 +111,6 @@ public:
 
     std::string GetErrorCodeStr() const {
         return ErrorCodeToStr(error_code_);
-    }
-
-    ErrorCode MoveCode() {
-        return std::move(error_code_);
-    }
-
-    std::string MoveMessage() {
-        return std::move(error_message_);
     }
 
     bool Is(ErrorCode error_code) const {
@@ -145,7 +157,7 @@ public:
         return res;
     }
 
-private:
+public:
     ErrorCode error_code_{ErrorCode::OK};
     std::string error_message_{ErrorCodeToStr(ErrorCode::OK)};
 

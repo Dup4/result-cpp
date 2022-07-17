@@ -2,6 +2,7 @@
 #include "snapshot/snapshot.h"
 
 #include "./custom_result/custom_result.h"
+#include "custom_result/custom_another_result.h"
 
 #include "result/macros.h"
 #include "result/result.h"
@@ -179,4 +180,29 @@ TEST_F(ResultTest, history_info_test) {
     auto history_info = err.GetPrettyHistoryInfo();
 
     EXPECT_FALSE(history_info.empty());
+}
+
+TEST_F(ResultTest, result_to_another_result_test) {
+    auto f = []() -> custom_result::CustomResult {
+        auto res = custom_another_result::CustomAnotherResult::Builder(
+                           custom_another_result::CustomAnotherResult::ErrorCode::OtherError)
+                           .Build();
+        return res;
+    };
+
+    auto res = f();
+    EXPECT_FALSE(res.IsOK());
+    EXPECT_EQ(res.Code(), custom_result::CustomResult::ErrorCode::NestedError);
+    EXPECT_EQ(res.Message(), std::string("OtherError"));
+}
+
+TEST_F(ResultTest, result_or_to_another_result_test) {
+    auto f = []() -> custom_result::CustomResult {
+        custom_another_result::CustomAnotherResultOr<int> a = 1;
+        return a;
+    };
+
+    auto res = f();
+    EXPECT_TRUE(res.IsOK());
+    EXPECT_EQ(res.Message(), std::string("OK"));
 }

@@ -11,12 +11,14 @@ namespace custom_result {
 enum class ErrorCode {
     OK = 0,
     OtherError,
+    NestedError,
 };
 
 inline auto ErrorCodeToStr(ErrorCode error_code) {
     static const std::map<custom_result::ErrorCode, std::string> ErrorCodeToStrMap = {
             {custom_result::ErrorCode::OK, "OK"},
             {custom_result::ErrorCode::OtherError, "OtherError"},
+            {custom_result::ErrorCode::NestedError, "NestedError"},
     };
 
     if (ErrorCodeToStrMap.count(error_code) == 0) {
