@@ -163,20 +163,73 @@ TEST_F(ResultTest, macros_RESULT_OR_VALUE_RETURN) {
 }
 
 TEST_F(ResultTest, history_info_test) {
-    auto a = []() {
-        RESULT_DIRECT_RETURN(CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build());
-    };
+    {
+        auto a = []() {
+            RESULT_DIRECT_RETURN(CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build());
+        };
 
-    auto b = [&a]() {
-        RESULT_DIRECT_RETURN(a());
-    };
+        auto b = [&a]() {
+            RESULT_DIRECT_RETURN(a());
+        };
 
-    auto c = [&b]() {
-        RESULT_DIRECT_RETURN(b());
-    };
+        auto c = [&b]() {
+            RESULT_DIRECT_RETURN(b());
+        };
 
-    auto res = c();
-    EXPECT_EQ(res.HistoryInfoList().size(), 3);
+        auto res = c();
+        EXPECT_EQ(res.HistoryInfoList().size(), 3);
+        SNAPSHOT(res.PrettyMessage());
+    }
+
+    {
+        auto a = []() {
+            RESULT_DIRECT_RETURN(CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build());
+        };
+
+        auto b = [&a]() -> custom_another_result::CustomAnotherResult {
+            RESULT_DIRECT_RETURN(a());
+        };
+
+        auto res = b();
+        EXPECT_EQ(res.HistoryInfoList().size(), 2);
+        SNAPSHOT(res.PrettyMessage());
+    }
+
+    {
+        auto a = []() {
+            RESULT_DIRECT_RETURN(CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build());
+        };
+
+        auto b = [&a]() -> custom_another_result::CustomAnotherResult {
+            RESULT_DIRECT_RETURN(a());
+        };
+
+        auto c = [&b]() {
+            RESULT_DIRECT_RETURN(b());
+        };
+
+        auto res = c();
+        EXPECT_EQ(res.HistoryInfoList().size(), 3);
+        SNAPSHOT(res.PrettyMessage());
+    }
+
+    {
+        auto a = []() {
+            RESULT_DIRECT_RETURN(CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build());
+        };
+
+        auto b = [&a]() -> custom_another_result::CustomAnotherResult {
+            RESULT_DIRECT_RETURN_WITH_NESTED_ERROR(a(), custom_another_result::CustomAnotherResult::ErrorCode::AError);
+        };
+
+        auto c = [&b]() {
+            RESULT_DIRECT_RETURN(b());
+        };
+
+        auto res = c();
+        EXPECT_EQ(res.HistoryInfoList().size(), 3);
+        SNAPSHOT(res.PrettyMessage());
+    }
 }
 
 TEST_F(ResultTest, result_to_another_result_test) {

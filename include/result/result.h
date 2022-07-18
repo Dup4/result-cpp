@@ -19,7 +19,7 @@ namespace result {
 
 struct HistoryInfoNode {
     std::string file_name;
-    std::string func_name;
+    std::string error_code_str;
     int32_t line;
 };
 
@@ -122,6 +122,16 @@ public:
         return error_message_;
     }
 
+    std::string PrettyMessage() const {
+        std::string res = "";
+        res += ErrorCodeStr();
+        res += ": ";
+        res += Message();
+        res += "\n";
+        res += PrettyHistoryInfo();
+        return res;
+    }
+
     bool Is(ErrorCode error_code) const {
         return error_code_ == error_code;
     }
@@ -130,21 +140,21 @@ public:
         return Is(ErrorCode::OK);
     }
 
-    void PushHistory(const std::string& file_name, const std::string& func_name, int32_t line) {
+    void PushHistory(const std::string& file_name, int32_t line) {
         if (IsOK()) {
             return;
         }
 
         history_info_list_.emplace_back(HistoryInfoNode{
                 .file_name = file_name,
-                .func_name = func_name,
+                .error_code_str = ErrorCodeStr(),
                 .line = line,
         });
 
         return;
     }
 
-    std::string PrettyHistoryInfo() {
+    std::string PrettyHistoryInfo() const {
         std::string res = "";
 
         int ix = 0;
@@ -153,14 +163,16 @@ public:
             const auto& info = history_info_list_[i];
 
             if (ix) {
-                res += " -> ";
+                res += "\n";
             }
 
             ix++;
 
-            res += info.file_name;
+            res += "(" + info.file_name;
             res += ":";
             res += std::to_string(info.line);
+            res += ") ";
+            res += info.error_code_str;
         }
 
         return res;
