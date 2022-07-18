@@ -65,7 +65,18 @@ static void BenchmarkResultOrToAnotherResult(benchmark::State& state) {
     }
 }
 
-static void BenchmarkResultOrToResultOr(benchmark::State& state) {
+static void BenchmarkResultOrToResultOrWithOK(benchmark::State& state) {
+    auto f = []() -> CustomResultOr<int> {
+        CustomResultOr<int> res = 1;
+        return res;
+    };
+
+    for (auto _ : state) {
+        auto res = f();
+    }
+}
+
+static void BenchmarkResultOrToResultOrWithError(benchmark::State& state) {
     auto f = []() -> CustomResultOr<int> {
         CustomResultOr<int> res = CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
         return res;
@@ -81,4 +92,5 @@ BENCHMARK(BenchmarkResultToResultOr);
 BENCHMARK(BenchmarkResultToAnotherResult);
 BENCHMARK(BenchmarkResultOrToResult);
 BENCHMARK(BenchmarkResultOrToAnotherResult);
-BENCHMARK(BenchmarkResultOrToResultOr);
+BENCHMARK(BenchmarkResultOrToResultOrWithOK);
+BENCHMARK(BenchmarkResultOrToResultOrWithError);

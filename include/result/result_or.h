@@ -1,9 +1,11 @@
 #ifndef RESULT_RESULT_OR_H
 #define RESULT_RESULT_OR_H
 
+#include <iostream>
 #include <optional>
 #include <type_traits>
 
+#include "./types_check/common.h"
 #include "./types_check/is_result.h"
 #include "./types_check/is_result_or.h"
 
@@ -13,6 +15,7 @@ namespace result {
 
 template <typename Result, typename T>
 class ResultOr : public Result {
+public:
     template <typename F>
     using ROr = ResultOr<Result, F>;
     using E = typename Result::ErrorCode;
@@ -29,16 +32,16 @@ public:
 
     ResultOr(const ROr<T>& other) : Result(other), value_(other.Value()) {}
 
-    template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
-    ResultOr(const ROr<F>& other) : Result(other) {}
-
     ResultOr(ROr<T>&& other) : Result(other), value_(std::move(other.Value())) {}
 
     template <typename A, std::enable_if_t<internal::is_result_v<A>, bool> = true>
     ResultOr(A&& a) : Result(std::forward<A>(a)) {
         if constexpr (internal::is_result_or_v<A>) {
-            if constexpr (std::is_same_v<std::remove_cv_t<decltype(a.Value())>, ValueType>) {
-                value_ = std::move(a.Value());
+            using _ValueType = decltype(a.CloneValue());
+            if constexpr (std::is_same_v<_ValueType, ValueType>) {
+                if (a.HasValue()) {
+                    value_ = std::move(a.Value());
+                }
             }
         }
     }
@@ -46,24 +49,18 @@ public:
     template <typename A, std::enable_if_t<internal::is_result_v<A>, bool> = true, typename B>
     ResultOr(A&& a, B&& b) : Result(std::forward<A>(a), std::forward<B>(b)) {
         if constexpr (internal::is_result_or_v<A>) {
-            if constexpr (std::is_same_v<std::remove_cv_t<decltype(a.Value())>, ValueType>) {
-                value_ = std::move(a.Value());
+            using _ValueType = decltype(a.CloneValue());
+            if constexpr (std::is_same_v<_ValueType, ValueType>) {
+                if (a.HasValue()) {
+                    value_ = std::move(a.Value());
+                }
             }
         }
     }
 
-    template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
-    ResultOr(ROr<F>&& other) : Result(other) {}
-
     ROr<T>& operator=(const ROr<T>& other) {
         Result::operator=(other);
         value_ = other.Value();
-        return *this;
-    }
-
-    template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
-    ROr<T>& operator=(const ROr<F>& other) {
-        Result::operator=(other);
         return *this;
     }
 
@@ -74,12 +71,38 @@ public:
     }
 
     template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
+    ResultOr(const ROr<F>& other) : Result(other) {
+        static_assert(internal::false_v<F>, "F must be the same type as T");
+    }
+
+    template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
+    ResultOr(ROr<F>&& other) : Result(other) {
+        static_assert(internal::false_v<F>, "F must be the same type as T");
+    }
+
+    template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
+    ROr<T>& operator=(const ROr<F>& other) {
+        static_assert(internal::false_v<F>, "F must be the same type as T");
+        Result::operator=(other);
+        return *this;
+    }
+
+    template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
     ROr<T>& operator=(ROr<F>&& other) {
+        static_assert(internal::false_v<F>, "F must be the same type as T");
         Result::operator=(other);
         return *this;
     }
 
     virtual ~ResultOr() override = default;
+
+    bool HasValue() const {
+        return value_.has_value();
+    }
+
+    T CloneValue() const {
+        return *value_;
+    }
 
     const T& Value() const& {
         return *value_;

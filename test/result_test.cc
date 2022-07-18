@@ -292,4 +292,18 @@ TEST_F(ResultTest, result_direct_return_with_nested_error) {
         EXPECT_EQ(res.Code(), custom_result::CustomResult::ErrorCode::NestedError);
         EXPECT_EQ(res.HistoryInfoList().size(), 1);
     }
+
+    {
+        auto f = []() -> custom_result::CustomResultOr<int> {
+            custom_another_result::CustomAnotherResultOr<int> a = 1;
+            EXPECT_TRUE(a.HasValue());
+
+            RESULT_DIRECT_RETURN(a);
+        };
+
+        auto res = f();
+        EXPECT_TRUE(res.IsOK());
+        EXPECT_TRUE(res.HasValue());
+        EXPECT_EQ(res.Value(), 1);
+    }
 }
