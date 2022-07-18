@@ -4,6 +4,9 @@
 #include <optional>
 #include <type_traits>
 
+#include "./types_check/is_result.h"
+#include "./types_check/is_result_or.h"
+
 #include "./result.h"
 
 namespace result {
@@ -12,27 +15,49 @@ template <typename Result, typename T>
 class ResultOr : public Result {
     template <typename F>
     using ROr = ResultOr<Result, F>;
+    using E = typename Result::ErrorCode;
+    using ValueType = T;
 
 public:
     ResultOr() = default;
 
+    ResultOr(const T& value) : value_(value) {}
     ResultOr(T&& value) : value_(std::move(value)) {}
 
+    ResultOr(const Result& res) : Result(res) {}
     ResultOr(Result&& result) : Result(std::move(result)) {}
 
-    ResultOr(const ROr<T>& other) : Result(other), value_(other.value_) {}
+    ResultOr(const ROr<T>& other) : Result(other), value_(other.Value()) {}
 
     template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
     ResultOr(const ROr<F>& other) : Result(other) {}
 
-    ResultOr(ROr<T>&& other) : Result(other), value_(std::move(other.value_)) {}
+    ResultOr(ROr<T>&& other) : Result(other), value_(std::move(other.Value())) {}
+
+    template <typename A, std::enable_if_t<internal::is_result_v<A>, bool> = true>
+    ResultOr(A&& a) : Result(std::forward<A>(a)) {
+        if constexpr (internal::is_result_or_v<A>) {
+            if constexpr (std::is_same_v<std::remove_cv_t<decltype(a.Value())>, ValueType>) {
+                value_ = std::move(a.Value());
+            }
+        }
+    }
+
+    template <typename A, std::enable_if_t<internal::is_result_v<A>, bool> = true, typename B>
+    ResultOr(A&& a, B&& b) : Result(std::forward<A>(a), std::forward<B>(b)) {
+        if constexpr (internal::is_result_or_v<A>) {
+            if constexpr (std::is_same_v<std::remove_cv_t<decltype(a.Value())>, ValueType>) {
+                value_ = std::move(a.Value());
+            }
+        }
+    }
 
     template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
     ResultOr(ROr<F>&& other) : Result(other) {}
 
     ROr<T>& operator=(const ROr<T>& other) {
         Result::operator=(other);
-        value_ = other.value_;
+        value_ = other.Value();
         return *this;
     }
 
@@ -44,7 +69,7 @@ public:
 
     ROr<T>& operator=(ROr<T>&& other) {
         Result::operator=(other);
-        value_ = std::move(other.value_);
+        value_ = std::move(other.Value());
         return *this;
     }
 

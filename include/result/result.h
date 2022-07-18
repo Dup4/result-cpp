@@ -78,21 +78,29 @@ public:
     Result(Result&&) = default;
     Result& operator=(Result&&) = default;
 
-    // template <
-    //         typename T,
-    //         std::enable_if_t<internal::is_result_v<T> && std::is_same_v<typename T::ErrorCode, ErrorCode>, bool> =
-    //         true>
-    // Result(T&& t) {
-    //     error_code_ = t.MoveCode();
-    //     error_message_ = t.MoveMessage();
-    // }
-
-    template <typename T,
-              std::enable_if_t<internal::is_result_v<T> && !std::is_same_v<typename T::ErrorCode, ErrorCode>, bool> =
-                      true>
+    template <typename T, std::enable_if_t<internal::is_result_v<T> && !std::is_same_v<T, R>, bool> = true>
     Result(T&& t) {
         if (!t.IsOK()) {
-            error_code_ = ErrorCode::NestedError;
+            if constexpr (std::is_same_v<decltype(t.Code()), ErrorCode>) {
+                error_code_ = t.Code();
+            } else {
+                error_code_ = ErrorCode::NestedError;
+            }
+
+            error_message_ = t.Message();
+            history_info_list_ = t.HistoryInfoList();
+        }
+    }
+
+    template <typename T, std::enable_if_t<internal::is_result_v<T> && !std::is_same_v<T, R>, bool> = true, typename F>
+    Result(T&& t, [[maybe_unused]] F&& f) {
+        if (!t.IsOK()) {
+            if constexpr (std::is_same_v<F, ErrorCode>) {
+                error_code_ = f;
+            } else {
+                error_code_ = ErrorCode::NestedError;
+            }
+
             error_message_ = t.Message();
             history_info_list_ = t.HistoryInfoList();
         }

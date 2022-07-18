@@ -175,11 +175,8 @@ TEST_F(ResultTest, history_info_test) {
         RESULT_DIRECT_RETURN(b());
     };
 
-    auto err = c();
-
-    auto history_info = err.PrettyHistoryInfo();
-
-    EXPECT_FALSE(history_info.empty());
+    auto res = c();
+    EXPECT_EQ(res.HistoryInfoList().size(), 3);
 }
 
 TEST_F(ResultTest, result_to_another_result_test) {
@@ -205,4 +202,94 @@ TEST_F(ResultTest, result_or_to_another_result_test) {
     auto res = f();
     EXPECT_TRUE(res.IsOK());
     EXPECT_EQ(res.Message(), std::string("OK"));
+}
+
+TEST_F(ResultTest, result_direct_return_with_nested_error) {
+    {
+        auto f = []() -> custom_result::CustomResult {
+            auto res = custom_another_result::CustomAnotherResult::Builder(
+                               custom_another_result::CustomAnotherResult::ErrorCode::OtherError)
+                               .Build();
+            RESULT_DIRECT_RETURN_WITH_NESTED_ERROR(res, custom_result::CustomResult::ErrorCode::OtherError);
+        };
+
+        auto res = f();
+        EXPECT_FALSE(res.IsOK());
+        EXPECT_EQ(res.Code(), custom_result::CustomResult::ErrorCode::OtherError);
+        EXPECT_EQ(res.HistoryInfoList().size(), 1);
+    }
+
+    {
+        auto f = []() -> custom_result::CustomResult {
+            custom_another_result::CustomAnotherResultOr<int> res =
+                    custom_another_result::CustomAnotherResult::Builder(
+                            custom_another_result::CustomAnotherResult::ErrorCode::AError)
+                            .Build();
+            RESULT_DIRECT_RETURN_WITH_NESTED_ERROR(res, custom_result::CustomResult::ErrorCode::BError);
+        };
+
+        auto res = f();
+        EXPECT_FALSE(res.IsOK());
+        EXPECT_EQ(res.Code(), custom_result::CustomResult::ErrorCode::BError);
+        EXPECT_EQ(res.HistoryInfoList().size(), 1);
+    }
+
+    {
+        auto f = []() -> custom_result::CustomResultOr<int> {
+            custom_another_result::CustomAnotherResultOr<int> res =
+                    custom_another_result::CustomAnotherResult::Builder(
+                            custom_another_result::CustomAnotherResult::ErrorCode::AError)
+                            .Build();
+            RESULT_DIRECT_RETURN_WITH_NESTED_ERROR(res, custom_result::CustomResult::ErrorCode::BError);
+        };
+
+        auto res = f();
+        EXPECT_FALSE(res.IsOK());
+        EXPECT_EQ(res.Code(), custom_result::CustomResult::ErrorCode::BError);
+        EXPECT_EQ(res.HistoryInfoList().size(), 1);
+    }
+
+    {
+        auto f = []() -> custom_result::CustomResultOr<int> {
+            auto res = custom_another_result::CustomAnotherResult::Builder(
+                               custom_another_result::CustomAnotherResult::ErrorCode::AError)
+                               .Build();
+            RESULT_DIRECT_RETURN_WITH_NESTED_ERROR(res, custom_result::CustomResult::ErrorCode::BError);
+        };
+
+        auto res = f();
+        EXPECT_FALSE(res.IsOK());
+        EXPECT_EQ(res.Code(), custom_result::CustomResult::ErrorCode::BError);
+        EXPECT_EQ(res.HistoryInfoList().size(), 1);
+    }
+
+    {
+        auto f = []() -> custom_result::CustomResult {
+            auto res = custom_another_result::CustomAnotherResult::Builder(
+                               custom_another_result::CustomAnotherResult::ErrorCode::AError)
+                               .Build();
+            RESULT_DIRECT_RETURN_WITH_NESTED_ERROR(res,
+                                                   custom_another_result::CustomAnotherResult::ErrorCode::OtherError);
+        };
+
+        auto res = f();
+        EXPECT_FALSE(res.IsOK());
+        EXPECT_EQ(res.Code(), custom_result::CustomResult::ErrorCode::NestedError);
+        EXPECT_EQ(res.HistoryInfoList().size(), 1);
+    }
+
+    {
+        auto f = []() -> custom_result::CustomResultOr<int> {
+            auto res = custom_another_result::CustomAnotherResult::Builder(
+                               custom_another_result::CustomAnotherResult::ErrorCode::AError)
+                               .Build();
+            RESULT_DIRECT_RETURN_WITH_NESTED_ERROR(res,
+                                                   custom_another_result::CustomAnotherResult::ErrorCode::OtherError);
+        };
+
+        auto res = f();
+        EXPECT_FALSE(res.IsOK());
+        EXPECT_EQ(res.Code(), custom_result::CustomResult::ErrorCode::NestedError);
+        EXPECT_EQ(res.HistoryInfoList().size(), 1);
+    }
 }
