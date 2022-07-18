@@ -2,6 +2,7 @@
 
 #include "./custom_result/custom_another_result.h"
 #include "./custom_result/custom_result.h"
+#include "result/macros.h"
 
 using namespace custom_result;
 
@@ -87,6 +88,38 @@ static void BenchmarkResultOrToResultOrWithError(benchmark::State& state) {
     }
 }
 
+static void BenchmarkResultHistoryInfoWithOK(benchmark::State& state) {
+    auto deepCall = [deep = state.range(0)](auto&& d, int cur) {
+        if (cur == deep) {
+            auto res = CustomResult::OK();
+            RESULT_DIRECT_RETURN(res);
+        } else {
+            RESULT_DIRECT_RETURN(d(d, cur + 1));
+        }
+    };
+
+    for (auto _ : state) {
+        auto res = deepCall(deepCall, 1);
+        auto pretty_message = res.PrettyMessage();
+    }
+}
+
+static void BenchmarkResultHistoryInfo(benchmark::State& state) {
+    auto deepCall = [deep = state.range(0)](auto&& d, int cur) {
+        if (cur == deep) {
+            auto res = CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
+            RESULT_DIRECT_RETURN(res);
+        } else {
+            RESULT_DIRECT_RETURN(d(d, cur + 1));
+        }
+    };
+
+    for (auto _ : state) {
+        auto res = deepCall(deepCall, 1);
+        auto pretty_message = res.PrettyMessage();
+    }
+}
+
 BENCHMARK(BenchmarkResultToResult);
 BENCHMARK(BenchmarkResultToResultOr);
 BENCHMARK(BenchmarkResultToAnotherResult);
@@ -94,3 +127,5 @@ BENCHMARK(BenchmarkResultOrToResult);
 BENCHMARK(BenchmarkResultOrToAnotherResult);
 BENCHMARK(BenchmarkResultOrToResultOrWithOK);
 BENCHMARK(BenchmarkResultOrToResultOrWithError);
+BENCHMARK(BenchmarkResultHistoryInfoWithOK)->Arg(4)->Arg(8)->Arg(16)->Arg(32)->Arg(64)->Arg(128);
+BENCHMARK(BenchmarkResultHistoryInfo)->Arg(4)->Arg(8)->Arg(16)->Arg(32)->Arg(64)->Arg(128);
