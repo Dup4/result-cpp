@@ -71,25 +71,19 @@ public:
     }
 
     template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
-    ResultOr(const ROr<F>& other) : Result(other) {
-        static_assert(internal::false_v<F>, "F must be the same type as T");
-    }
+    ResultOr(const ROr<F>& other) : Result(other) {}
 
     template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
-    ResultOr(ROr<F>&& other) : Result(other) {
-        static_assert(internal::false_v<F>, "F must be the same type as T");
-    }
+    ResultOr(ROr<F>&& other) : Result(other) {}
 
     template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
     ROr<T>& operator=(const ROr<F>& other) {
-        static_assert(internal::false_v<F>, "F must be the same type as T");
         Result::operator=(other);
         return *this;
     }
 
     template <typename F, std::enable_if_t<!std::is_same_v<F, T>, bool> = true>
     ROr<T>& operator=(ROr<F>&& other) {
-        static_assert(internal::false_v<F>, "F must be the same type as T");
         Result::operator=(other);
         return *this;
     }
