@@ -132,8 +132,9 @@ public:
         return res;
     }
 
-    bool Is(ErrorCode error_code) const {
-        return error_code_ == error_code;
+    template <typename... T, std::enable_if_t<std::conjunction_v<std::is_same<ErrorCode, T>...>, bool> = true>
+    bool Is(T&&... t) const {
+        return (... || (t == error_code_));
     }
 
     bool IsOK() const {
