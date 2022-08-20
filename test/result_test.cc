@@ -365,10 +365,21 @@ TEST_F(ResultTest, result_direct_return_with_nested_error) {
 }
 
 TEST_F(ResultTest, smart_pointer_with_nullptr) {
-    auto f = []() -> custom_result::CustomResultOr<std::shared_ptr<int>> {
-        return std::make_shared<int>(1);
-    };
+    {
+        auto f = []() -> custom_result::CustomResultOr<std::shared_ptr<int>> {
+            return std::make_shared<int>(1);
+        };
 
-    auto res = f();
-    EXPECT_EQ(*res.Value(), 1);
+        auto res = f();
+        EXPECT_EQ(*res.Value(), 1);
+    }
+
+    {
+        auto f = []() -> custom_result::CustomResultOr<std::shared_ptr<int>> {
+            return std::shared_ptr<int>(nullptr);
+        };
+
+        auto res = f();
+        EXPECT_EQ(res.Value(), nullptr);
+    }
 }
