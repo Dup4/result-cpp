@@ -23,6 +23,7 @@ public:
 
 public:
     ResultOr() = default;
+    virtual ~ResultOr() override = default;
 
     ResultOr(const T& value) : value_(value) {}
     ResultOr(T&& value) : value_(std::move(value)) {}
@@ -87,8 +88,6 @@ public:
         Result::operator=(other);
         return *this;
     }
-
-    virtual ~ResultOr() override = default;
 
     bool HasValue() const {
         return value_.has_value();
