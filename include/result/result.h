@@ -142,17 +142,17 @@ public:
     }
 
     template <typename F>
-    auto NotOKThen(F&& f) {
+    void NotOKThen(F&& f) {
         if (IsOK()) {
             return;
         }
 
-        return f(*this);
+        f(*this);
     }
 
     template <typename F>
-    auto AlwaysThen(F&& f) {
-        return f(*this);
+    void AlwaysThen(F&& f) {
+        f(*this);
     }
 
     void PushHistory(const std::string& file_name, int32_t line) {
