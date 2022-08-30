@@ -383,3 +383,39 @@ TEST_F(ResultTest, smart_pointer_with_nullptr) {
         EXPECT_EQ(res.Value(), nullptr);
     }
 }
+
+TEST_F(ResultTest, NotOKThen) {
+    int flag = 0;
+
+    std::invoke([]() -> CustomResult {
+        return CustomResult::OK();
+    }).NotOKThen([&flag]([[maybe_unused]] auto&& res) {
+        ++flag;
+    });
+
+    EXPECT_EQ(flag, 0);
+
+    std::invoke([]() -> CustomResult {
+        return CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
+    }).NotOKThen([&flag]([[maybe_unused]] auto&& res) {
+        ++flag;
+    });
+
+    EXPECT_EQ(flag, 1);
+
+    std::invoke([]() -> CustomResult {
+        return CustomResult::OK();
+    }).AlwaysThen([&flag]([[maybe_unused]] auto&& res) {
+        ++flag;
+    });
+
+    EXPECT_EQ(flag, 2);
+
+    std::invoke([]() -> CustomResult {
+        return CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
+    }).AlwaysThen([&flag]([[maybe_unused]] auto&& res) {
+        ++flag;
+    });
+
+    EXPECT_EQ(flag, 3);
+}
