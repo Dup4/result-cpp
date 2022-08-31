@@ -33,7 +33,7 @@ public:
 
     ResultOr(const ROr<T>& other) : Result(other) {
         if (other.HasValue()) {
-            value_ = std::move(other.Value());
+            value_ = other.Value();
         }
     }
 
