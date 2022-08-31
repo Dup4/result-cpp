@@ -2,7 +2,7 @@ option(result_cpp_build_tests "Build all of result-cpp's own tests." OFF)
 
 cmake_minimum_required(VERSION 3.14)
 
-project(result-cpp VERSION 0.0.11)
+project(result-cpp VERSION 0.0.12)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
