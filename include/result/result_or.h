@@ -31,9 +31,17 @@ public:
     ResultOr(const Result& res) : Result(res) {}
     ResultOr(Result&& result) : Result(std::move(result)) {}
 
-    ResultOr(const ROr<T>& other) : Result(other), value_(other.Value()) {}
+    ResultOr(const ROr<T>& other) : Result(other) {
+        if (other.HasValue()) {
+            value_ = std::move(other.Value());
+        }
+    }
 
-    ResultOr(ROr<T>&& other) : Result(other), value_(std::move(other.Value())) {}
+    ResultOr(ROr<T>&& other) : Result(other) {
+        if (other.HasValue()) {
+            value_ = std::move(other.Value());
+        }
+    }
 
     template <typename A, std::enable_if_t<internal::is_result_v<A>, bool> = true>
     ResultOr(A&& a) : Result(std::forward<A>(a)) {
@@ -61,13 +69,21 @@ public:
 
     ROr<T>& operator=(const ROr<T>& other) {
         Result::operator=(other);
-        value_ = other.Value();
+
+        if (other.HasValue()) {
+            value_ = other.Value();
+        }
+
         return *this;
     }
 
     ROr<T>& operator=(ROr<T>&& other) {
         Result::operator=(other);
-        value_ = std::move(other.Value());
+
+        if (other.HasValue()) {
+            value_ = std::move(other.Value());
+        }
+
         return *this;
     }
 
