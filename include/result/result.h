@@ -19,6 +19,7 @@ namespace result {
 
 struct HistoryInfoNode {
     std::string file_name;
+    int32_t error_code_num;
     std::string error_code_str;
     int32_t line;
 };
@@ -162,6 +163,7 @@ public:
 
         history_info_list_.emplace_back(HistoryInfoNode{
                 .file_name = file_name,
+                .error_code_num = static_cast<int32_t>(error_code_),
                 .error_code_str = ErrorCodeStr(),
                 .line = line,
         });
