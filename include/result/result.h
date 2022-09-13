@@ -199,6 +199,14 @@ public:
         return history_info_list_;
     }
 
+    std::optional<HistoryInfoNode> GetHistoryInfoNode(int ix) const {
+        if (history_info_list_.size() < size_t(ix)) {
+            return std::nullopt;
+        }
+
+        return history_info_list_.end()[-ix];
+    }
+
 private:
     ErrorCode error_code_{ErrorCode::OK};
     std::string error_message_{ErrorCodeToStr(ErrorCode::OK)};

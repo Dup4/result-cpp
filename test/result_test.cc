@@ -419,3 +419,18 @@ TEST_F(ResultTest, NotOKThen) {
 
     EXPECT_EQ(flag, 3);
 }
+
+TEST_F(ResultTest, GetHistoryInfoNode) {
+    auto res = std::invoke([]() -> CustomResult {
+        auto res = custom_another_result::CustomAnotherResult::Builder(
+                           custom_another_result::CustomAnotherResult::ErrorCode::OtherError)
+                           .Build();
+        RESULT_OK_OR_RETURN_WITH_NESTED_ERROR(res, CustomResult::ErrorCode::NestedError);
+        return CustomResult::OK();
+    });
+
+    auto n = res.GetHistoryInfoNode(1);
+    EXPECT_TRUE(n.has_value());
+    EXPECT_EQ(n->error_code_num, 1);
+    EXPECT_EQ(n->error_code_str, std::string("OtherError"));
+}
