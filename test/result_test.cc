@@ -1,13 +1,13 @@
 #include "gtest/gtest.h"
 #include "snapshot/snapshot.h"
 
-#include "./custom_result/custom_result.h"
-#include "custom_result/custom_another_result.h"
-
 #include "result/macros.h"
 #include "result/result.h"
 #include "result/result_or.h"
 #include "result/types_check/has_error_code_to_str.h"
+
+#include "./custom_result/custom_another_result.h"
+#include "./custom_result/custom_result.h"
 
 using namespace custom_result;
 

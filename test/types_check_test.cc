@@ -1,11 +1,11 @@
 #include "gtest/gtest.h"
 #include "snapshot/snapshot.h"
 
-#include "./custom_result/custom_result.h"
-
 #include "result/result.h"
 #include "result/types_check/is_result.h"
 #include "result/types_check/is_result_or.h"
+
+#include "./custom_result/custom_result.h"
 
 class TypesCheckTest : public testing::Test {
 protected:
