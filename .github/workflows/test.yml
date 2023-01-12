@@ -5,7 +5,6 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -26,6 +25,8 @@ jobs:
             compiler_version: 15
           - compiler: clang
             compiler_version: 12
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v3
