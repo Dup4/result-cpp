@@ -1,8 +1,8 @@
-option(result_cpp_build_tests "Build all of result-cpp's own tests." OFF)
+option(RESULT_CPP_BUILD_TESTS "Build all of result-cpp's own tests." OFF)
 
 cmake_minimum_required(VERSION 3.14)
 
-project(result-cpp VERSION 0.0.14)
+project(result-cpp)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,7 +22,7 @@ include_directories(
 add_library(result-cpp INTERFACE)
 target_include_directories(result-cpp INTERFACE ${PROJECT_SOURCE_DIR}/include/)
 
-if(result_cpp_build_tests)
+if(RESULT_CPP_BUILD_TESTS)
     enable_testing()
 
     add_subdirectory(test/)

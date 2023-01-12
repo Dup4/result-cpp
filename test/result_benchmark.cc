@@ -1,8 +1,9 @@
 #include "benchmark/benchmark.h"
 
+#include "result/macros.h"
+
 #include "./custom_result/custom_another_result.h"
 #include "./custom_result/custom_result.h"
-#include "result/macros.h"
 
 using namespace custom_result;
 

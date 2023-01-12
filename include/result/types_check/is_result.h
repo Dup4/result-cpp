@@ -7,7 +7,7 @@
 namespace result::internal {
 
 template <typename T>
-inline constexpr bool is_result_v = has_code_v<T>&& has_message_v<T>;
+inline constexpr bool is_result_v = has_code_v<T> && has_message_v<T>;
 
 }  // namespace result::internal
 

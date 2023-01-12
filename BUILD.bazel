@@ -1,0 +1,51 @@
+package(default_visibility = ["//visibility:public"])
+
+common_copts = [
+    "-std=c++17",
+    "-O3",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+]
+
+cc_library(
+    name = "result-cpp",
+    hdrs = glob([
+        "include/result/*.h",
+        "include/result/**/*.h",
+    ]),
+    copts = common_copts,
+    includes = [
+        "include",
+    ],
+)
+
+cc_test(
+    name = "unittest",
+    srcs = glob([
+        "test/**/*.h",
+        "test/*_test.cc",
+    ]),
+    copts = common_copts + [
+        "-fno-access-control",
+    ],
+    deps = [
+        ":result-cpp",
+        "@gtest//:gtest_main",
+        "@snapshot",
+    ],
+)
+
+cc_binary(
+    name = "benchmark",
+    srcs = glob([
+        "test/**/*.h",
+        "test/*_benchmark.cc",
+    ]),
+    copts = common_copts,
+    deps = [
+        ":result-cpp",
+        "@google_benchmark//:benchmark_main",
+    ],
+)
