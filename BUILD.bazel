@@ -10,7 +10,7 @@ common_copts = [
 ]
 
 cc_library(
-    name = "result",
+    name = "result-cpp",
     hdrs = glob([
         "include/result/*.h",
         "include/result/**/*.h",
@@ -31,7 +31,7 @@ cc_test(
         "-fno-access-control",
     ],
     deps = [
-        ":result",
+        ":result-cpp",
         "@gtest//:gtest_main",
         "@snapshot",
     ],
@@ -45,7 +45,7 @@ cc_binary(
     ]),
     copts = common_copts,
     deps = [
-        ":result",
+        ":result-cpp",
         "@google_benchmark//:benchmark_main",
     ],
 )
