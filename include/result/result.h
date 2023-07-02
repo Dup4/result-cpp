@@ -143,17 +143,21 @@ public:
     }
 
     template <typename F>
-    void NotOKThen(F&& f) {
+    R& NotOKThen(F&& f) {
         if (IsOK()) {
             return;
         }
 
         f(*this);
+
+        return static_cast<R&>(*this);
     }
 
     template <typename F>
-    void AlwaysThen(F&& f) {
+    R& AlwaysThen(F&& f) {
         f(*this);
+
+        return static_cast<R&>(*this);
     }
 
     void PushHistory(const std::string& file_name, int32_t line) {

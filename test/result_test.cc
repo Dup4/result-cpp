@@ -384,7 +384,7 @@ TEST_F(ResultTest, smart_pointer_with_nullptr) {
     }
 }
 
-TEST_F(ResultTest, NotOKThen) {
+TEST_F(ResultTest, NotOKThenAndAlwaysThen) {
     int flag = 0;
 
     std::invoke([]() -> CustomResult {
@@ -418,6 +418,26 @@ TEST_F(ResultTest, NotOKThen) {
     });
 
     EXPECT_EQ(flag, 3);
+
+    {
+        int n_flag = 0;
+        int a_flag = 0;
+
+        std::invoke([]() -> CustomResult {
+            return CustomResult::Builder(CustomResult::ErrorCode::OtherError).Build();
+        })
+                .NotOKThen([&n_flag](auto&& res) {
+                    EXPECT_FALSE(res.IsOK());
+                    n_flag = 1;
+                })
+                .AlwaysThen([&a_flag](auto&& res) {
+                    EXPECT_FALSE(res.IsOK());
+                    a_flag = 1;
+                });
+
+        EXPECT_EQ(n_flag, 1);
+        EXPECT_EQ(a_flag, 1);
+    }
 }
 
 TEST_F(ResultTest, GetHistoryInfoNode) {
