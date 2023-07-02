@@ -145,7 +145,7 @@ public:
     template <typename F>
     R& NotOKThen(F&& f) {
         if (IsOK()) {
-            return;
+            return static_cast<R&>(*this);
         }
 
         f(*this);
