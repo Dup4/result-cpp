@@ -6,3 +6,7 @@
 [![Test](https://github.com/Dup4/result-cpp/workflows/Test/badge.svg)](https://github.com/Dup4/result-cpp/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/Dup4/result-cpp/branch/main/graph/badge.svg)](https://codecov.io/gh/Dup4/result-cpp)
 [![GitHub release](https://img.shields.io/github/release/Dup4/result-cpp.svg)](https://github.com/Dup4/result-cpp/releases/)
+
+## License
+
+[MIT](./LICENSE) License © 2022 - PRESENT [Dup4][dup4]
