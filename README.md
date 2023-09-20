@@ -37,3 +37,5 @@ See the usage in the [unit test](./test/result_test.cc)
 ## License
 
 [MIT](./LICENSE) License © 2022 - PRESENT [Dup4][dup4]
+
+[dup4]: https://github.com/Dup4
